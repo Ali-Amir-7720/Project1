@@ -1,154 +1,153 @@
 #ifndef PROPERTY_H
 #define PROPERTY_H
+
 #include "tiles.h"
-#include<iostream>
-class Property :public Tiles {
+#include <iostream>
+using namespace std;
+
+class Property : public Tiles {
 private:
-	int price;
-	bool is_bought;
-	Player* owner;
-	int houses_count;
-	bool is_hotel;
-	int base_rent;
-	bool is_mortgaged;
-	//int upgrade_cost;
+    int price;
+    bool is_bought;
+    Player* owner;
+    int houses_count;
+    bool is_hotel;
+    int base_rent;
+    bool is_mortgaged;
+
 public:
-	Property() :Tiles("",0), price(0), is_bought(false) {};
-	Property(string n, int pos, int p) :Tiles(n, pos), price(p), is_bought(false){};
-	void onLand(Player& P)override {
-		char p;
-		if (!is_bought) {
-			cout << "Would You Like to buy this property? y(Yes)." << endl;
-			cin >> p;
-			if (p == 'y' || p == 'Y') {
-				if (P.deductMoney(price) == true)
-				{
-					is_bought = true;
-					owner->addProperty(P);
-				}
-				else {
-					cout << "Cannot Buy Property." << endl;
-				}
-			}
-			return;
-		}
-		if (owner != &P) {
-			if (houses_count == 0) {
-				P->deductMoney(base_rent);
-				owner->addMoney(base_rent);
-			}
-			else if (houses_count == 1) {
-				P->deductMoney(base_rent*1.5);
-				owner->addMoney(base_rent*1.5);
-			}
-			else if (houses_count == 2) {
-				P->deductMoney(base_rent * 2.5);
-				owner->addMoney(base_rent*2.5);
-			}
-			else if (houses_count == 3) {
-				P->deductMoney(base_rent * 3.5);
-				owner->addMoney(base_rent*3.5);
-			}
-			else if (houses_count == 4) {
-				P->deductMoney(base_rent * 4.5);
-				owner->addMoney(base_rent*4.5);
-			}
-			else {
-				P->deductMoney(base_rent * 6.5);
-				owner->addMoney(base_rent*6.5);
-			}
-		}
-	}
-	void display()const override {
-		cout << Tiles(name,position);
-	}
-	void upgradeProperty(Player & P) {
-		if (owner == &P) {
-			if (P.jailStatus() == true) {
-				cout << "You cannot build.You're in jail.";
-				return;
-			}
-			char p;
-			cout << "Would you like to upgrade your property? (y/n): ";
-			cin >> p;
+    Property() : Tiles("", 0), price(0), is_bought(false), owner(nullptr),
+        houses_count(0), is_hotel(false), base_rent(0), is_mortgaged(false) {
+    }
 
-			if (p == 'y' || p == 'Y') {
-				cout << "How many houses do you want to build? ";
-				int l;
-				cin >> l;
+    Property(string n, int pos, int p, int br) :
+        Tiles(n, pos), price(p), is_bought(false), owner(nullptr),
+        houses_count(0), is_hotel(false), base_rent(br), is_mortgaged(false) {
+    }
 
-				if (l > 0 && (houses_count + l) <= 5) {
-					houses_count += l;
-					int cost = static_cast<int>(price * l * 0.5);
-					if (owner->deductMoney(cost)) {
-						cout << "Successfully built " << l << " house(s)." << endl;
-					}
-					else {
-						houses_count -= l; 
-						cout << "Upgrade cancelled due to insufficient funds." << endl;	
-					   }
-					}
-				else {
-					cout << "Invalid number of houses. You can only have up to 5 total." << endl;
-				}
-			}
-			else {
-				cout << "Upgrade cancelled." << endl;
-			}
-		}
-		else {
-			cout << "You do not own this property." << endl;
-		}
-	}
-	bool Mortgage(Player& P) {
-		if (owner != &P) {
-			cout << "You do not own this property.";
-			return false;
-		}
-		if (is_mortgaged) {
-			cout << "You've already mortgaged this Property.";
-			return false;
-		}
-		if (P.jailStatus() == true) {
-			cout << "You cannot mortgage in jail.";
-			return false;
-		}
-		is_mortgaged = true;
-		int mm = static_cast<int>(price*0.5);
-		owner.addMoney(mm);
-		cout << "Property Successfully Mortgaged.";
-		return true;
-	}
-	bool Unmortgage(Player& P) {
-		if (is_mortgaged) {
-			if (owner == &P) {
-				int um = static_cast<int>(price*0.6);
-				if (P.deductMoney(um)) {
-					is_mortgaged = false;
-					cout << "Property Successfuly Unmortgaged.";
-					return true;
-				}
-				else {
-					cout << "Cannot Unmortgage Property.Not enough Money ";
-					return false;
-				}
-			}
-			else {
-				cout << "You do not own this property.";
-				return false;
-			}
-		}
-		else {
-			cout << "Property Is not Mortgaged.";
-			return false;
-		}
-	}
-	bool isMortgaged() const {
-	/*	if (is_mortgaged) {
-			return true;
-		}
-		return false;*/
-		return is_mortgaged;
-	}
+    void onLand(Player& P) override {
+        if (!is_bought) {
+            cout << "You landed on " << getName() << ". Would you like to buy it for $" << price << "? (y/n): ";
+            char choice;
+            cin >> choice;
+            if (choice == 'y' || choice == 'Y') {
+                if (P.deductMoney(price)) {
+                    is_bought = true;
+                    owner = &P;
+                    P.addProperty(this);
+                    cout << "You bought " << getName() << "!" << endl;
+                }
+                else {
+                    cout << "Not enough money to buy." << endl;
+                }
+            }
+            return;
+        }
+
+        if (owner != &P && !is_mortgaged) {
+            int rent = base_rent + houses_count * (base_rent / 2);
+            cout << "You landed on " << getName() << " owned by " << owner->getName()
+                << ". You owe $" << rent << " in rent." << endl;
+            if (P.deductMoney(rent)) {
+                owner->addMoney(rent);
+            }
+        }
+    }
+
+    void display() const override {
+        cout << "Property: " << getName()
+            << " | Position: " << getPosition()
+            << " | Price: $" << price
+            << " | Base Rent: $" << base_rent;
+        if (is_bought) {
+            cout << " | Owner: " << owner->getName()
+                << " | Houses: " << houses_count
+                << " | Hotel: " << (is_hotel ? "Yes" : "No")
+                << " | Mortgaged: " << (is_mortgaged ? "Yes" : "No");
+        }
+        else {
+            cout << " | Available to Buy";
+        }
+        cout << endl;
+    }
+
+    bool isMortgaged() const {
+        return is_mortgaged;
+    }
+
+    void upgradeProperty(Player& P) {
+        if (owner != &P) {
+            cout << "You don't own this property." << endl;
+            return;
+        }
+
+        if (P.jailStatus()) {
+            cout << "You can't upgrade while in jail." << endl;
+            return;
+        }
+
+        char choice;
+        cout << "Would you like to upgrade " << getName() << "? (y/n): ";
+        cin >> choice;
+        if (choice == 'y' || choice == 'Y') {
+            int amount;
+            cout << "How many houses do you want to build (max 4, 5 = hotel)? ";
+            cin >> amount;
+
+            if (amount <= 0 || (houses_count + amount) > 5) {
+                cout << "Invalid number of upgrades." << endl;
+                return;
+            }
+
+            int cost = amount * (price / 2);
+            if (P.deductMoney(cost)) {
+                houses_count += amount;
+                is_hotel = (houses_count == 5);
+                cout << "Upgraded successfully. Current houses: " << houses_count << endl;
+            }
+            else {
+                cout << "Not enough money to upgrade." << endl;
+            }
+        }
+    }
+
+    void mortgage(Player& P) {
+        if (owner != &P) {
+            cout << "You don't own this property." << endl;
+            return;
+        }
+
+        if (is_mortgaged) {
+            cout << "Already mortgaged." << endl;
+            return;
+        }
+
+        if (P.jailStatus()) {
+            cout << "You can't mortgage from jail." << endl;
+            return;
+        }
+
+        is_mortgaged = true;
+        int value = price / 2;
+        P.addMoney(value);
+        cout << "Property mortgaged for $" << value << "." << endl;
+    }
+
+    void unmortgage(Player& P) {
+        if (owner != &P || !is_mortgaged) {
+            cout << "Unmortgage not allowed." << endl;
+            return;
+        }
+
+        int cost = price * 0.6;
+        if (P.deductMoney(cost)) {
+            is_mortgaged = false;
+            cout << "Unmortgaged successfully." << endl;
+        }
+        else {
+            cout << "Not enough money to unmortgage." << endl;
+        }
+    }
 };
+
 #endif

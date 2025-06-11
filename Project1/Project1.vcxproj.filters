@@ -14,4 +14,36 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tiles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="property.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="railway.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tax.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Freeparking.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Jail.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GoToJail.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

@@ -11,18 +11,21 @@ public:
 	Tiles() :name(""), position(0) {};
 	Tiles(string n, int p) {
 		this->name = n;
-		this->position =p;
+		this->position = p;
 	}
-	virtual void onLand(Player& P)=0;
+	virtual void onLand(Player& P) = 0;
 	int getPosition() const {
 		return position;
 	}
 	virtual void display()const = 0;
-	virtual ~Tile() {
-		delete Tiles;
+	virtual ~Tiles() = 0;
+	string getName()const {
+		return name;
 	}
-	int getPosition() const {
-		return position;
+	virtual void display() const {
+		cout << "Name " << name<<endl;
+		cout << "Position " << position << endl;
 	}
+
 };
 #endif
