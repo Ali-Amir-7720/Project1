@@ -6,8 +6,13 @@ public:
 	GoToJail() :Tiles("", 0) {};
 	GoToJail(string n, int p) :Tiles(n, p) {};
 	void onLand(Player& P) {
-		P.JailStatus();
+		P.goToJail();
 		cout << P.getName() << " sent To Jail." << endl;
 	}
+	void display() const override {
+		cout << "[GO TO JAIL] Name: " << getName()
+			<< ", Position: " << getPosition() << endl;
+	}
+
 };
 #endif

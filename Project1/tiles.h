@@ -1,5 +1,5 @@
 #ifndef TILES_H
-#define TILES_h
+#define TILES_H
 #include"player.h"
 #include<string>
 using namespace std;
@@ -17,15 +17,10 @@ public:
 	int getPosition() const {
 		return position;
 	}
-	virtual void display()const = 0;
-	virtual ~Tiles() = 0;
+	
 	string getName()const {
 		return name;
 	}
-	virtual void display() const {
-		cout << "Name " << name<<endl;
-		cout << "Position " << position << endl;
-	}
-
+	virtual void display() const = 0;
 };
 #endif

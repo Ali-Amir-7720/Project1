@@ -19,5 +19,10 @@ public:
 	int getTax() const {
 		return tax;
 	}
+	void display() const override {
+		cout << "[TAX] Name: " << getName()
+			<< ", Position: " << getPosition()
+			<< ", Tax Amount: $" << tax << endl;
+	}
 };
 #endif

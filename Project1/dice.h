@@ -1,5 +1,6 @@
 #ifndef DICE_H
 #define DICE_H
+#include<iostream>
 #include "player.h"
 #include<cstdlib>
 using namespace std;
@@ -14,7 +15,7 @@ public:
             int d = d_1 + d_2;
             return d;
     }
-    bool isEqual() {
+    bool isEqual()const {
         if (d_1 == d_2) {
             return true;
         }
@@ -25,6 +26,12 @@ public:
     }
     int getDice2()const {
         return d_2;
+    }
+    void displayRoll() const {
+        cout << "Rolled dice: [" << d_1 << "] and [" << d_2 << "] — Total: " << d_1 + d_2 << endl;
+        if (isEqual()) {
+            cout << "You rolled a double!" << endl;
+        }
     }
 };
 #endif

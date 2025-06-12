@@ -10,7 +10,7 @@ private:
 	string name;
 	int r_c;
 	int pos;
-	vector<Tiles*> owned_property;
+	vector<Property*> owned_property;
 	bool jail_status;
 	int jail_turns;
 public:
@@ -20,7 +20,7 @@ public:
 		r_c = 0;
 		money = 5000;
 		jail_status = false;
-		jail_turns = 0;
+		jail_turns = 3;
 	}
 	void ReleasefromJail() {
 		jail_status = true;
@@ -37,7 +37,7 @@ public:
 	bool jailStatus()const {
 		return jail_status;
 	}
-    const vector<Tiles*>& getProperties () const {
+    const vector<Property*>& getProperties () const {
 		return owned_property;
 	}
 	void Move(int steps) {
@@ -73,10 +73,10 @@ public:
 		owned_property.push_back(t);
 		cout << t << owned_property->getName() << " at " << "Position : " << owned_property.getPosition() << endl;
 	}
-	void JailStatus() {
+	void goToJail() {
 		jail_status = true;
 		pos = 10;
-		jail_turns = 3;
+		jail_turns = 0;
 		cout << "Player " << name << " is sent to jail.";
 	}
 	bool isBankrupt() {
@@ -84,12 +84,15 @@ public:
 			return false;
 		}
         for (int i = 0;i < (int)owned_property.size();i++) {
-			Tiles* p = owned_property[i];
-			if (){//!p->isMortgaged()) {
+			Property* p = owned_property[i];
+			if (p->isMortgaged()){
 				return false;
 			}
 		}
 		return true;
+	}
+	void IncrementJailTurns() {
+		jail_turns++;
 	}
 	void removeRailway() {
 		r_c--;

@@ -98,6 +98,15 @@ public:
     bool isMortgaged() const {
         return is_mortgaged;
     }
+    void display() const override {
+        cout << "[UTILITY] Name: " << getName()
+            << ", Position: " << getPosition()
+            << ", Price: $" << price
+            << ", Owned: " << (is_bought ? "Yes" : "No")
+            << ", Mortgaged: " << (is_mortgaged ? "Yes" : "No")
+            << ", Owner: " << (owner ? owner->getName() : "None") << endl;
+    }
+
 };
 
 #endif

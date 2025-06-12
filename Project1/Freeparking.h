@@ -1,5 +1,5 @@
 #ifndef FREEPARKING_H
-#define FREEPARKINGH_H
+#define FREEPARKING_H
 #include "tiles.h"
 class FreeParking :public Tiles {
 private:
@@ -7,5 +7,13 @@ private:
 public:
 	FreeParking() :Tiles("", 0) {};
 	FreeParking(string n, int pos) :Tiles(n, pos) {};
+	void onLand(Player& P)override {
+		cout << P.getName() << " Is At " << getName() << " Position : " << getPosition() << endl;
+	}
+	void display() const override {
+		cout << "[FREE PARKING] Name: " << getName()
+			<< ", Position: " << getPosition() << endl;
+	}
+
 };
 #endif

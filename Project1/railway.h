@@ -94,6 +94,7 @@ public:
 		int value = price / 2;
 		P.addMoney(value);
 		cout << getName()<<"Property mortgaged for $" << value << "." << endl; 
+		P.removeRailway();
 	}
 	void unmortgage(Player& P) {
 		if (owner != &P || !is_mortgaged) {
@@ -105,6 +106,7 @@ public:
 		if (P.deductMoney(cost)) {
 			is_mortgaged = false;
 			cout << "Unmortgaged successfully." << endl;
+			P.addRailway();
 		}
 		else {
 			cout << "Not enough money to unmortgage." << endl;
@@ -112,6 +114,15 @@ public:
 	}
 	Player* getOwner()const {
 		return owner;
+	}
+	void display() const override {
+		cout << "[RAILWAY] Name: " << getName()
+			<< ", Position: " << getPosition()
+			<< ", Price: $" << price
+			<< ", Rent: $" << rent
+			<< ", Owned: " << (is_bought ? "Yes" : "No")
+			<< ", Mortgaged: " << (is_mortgaged ? "Yes" : "No")
+			<< ", Owner: " << (owner ? owner->getName() : "None") << endl;
 	}
 };
 #endif
