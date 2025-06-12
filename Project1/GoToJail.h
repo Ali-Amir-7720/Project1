@@ -1,6 +1,6 @@
 #ifndef GOTOJAIL_H
 #define GOTOJAIL_H
-#include "tiles.h"
+#include "Tiles.h"
 class GoToJail :public Tiles {
 public:
 	GoToJail() :Tiles("", 0) {};

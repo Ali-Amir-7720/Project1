@@ -1,19 +1,18 @@
 #ifndef DICE_H
 #define DICE_H
 #include<iostream>
-#include "player.h"
 #include<cstdlib>
 using namespace std;
 class Dice {
 private:
     int d_1, d_2;
 public:
-    Dice() : d_1( 0), d_2 (0){};
+    Dice() : d_1(0), d_2(0) {};
     int rollDice() {
-            d_1 = rand() % 6 + 1;
-            d_2 = rand() % 6 + 1;
-            int d = d_1 + d_2;
-            return d;
+        d_1 = rand() % 6 + 1;
+        d_2 = rand() % 6 + 1;
+        int d = d_1 + d_2;
+        return d;
     }
     bool isEqual()const {
         if (d_1 == d_2) {

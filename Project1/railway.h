@@ -1,6 +1,6 @@
 #ifndef RAILWAY_H
 #define RAILWAY_H
-#include "tiles.h"
+#include "Tiles.h"
 #include "player.h"
 class Railways :public Tiles {
 private:
@@ -10,17 +10,18 @@ private:
 	bool is_mortgaged;
 	Player* owner;
 public:
-	Railways() :Tiles(),price(0), rent(0), is_bought(false),is_mortgaged(false),owner(nullptr) {};
-	Railways(string n, int pos, int rent,int pr) :Tiles(n, pos),price(pr), is_bought(true), is_mortgaged(false), owner(nullptr) {};
+	Railways() :Tiles(), price(0), rent(0), is_bought(false), is_mortgaged(false), owner(nullptr) {};
+	Railways(string n, int pos, int rent, int pr) :Tiles(n, pos), price(pr), is_bought(true),rent(rent), is_mortgaged(false), owner(nullptr) {};
 	void onLand(Player& P)override {
 		if (!is_bought) {
 			char c;
 			cout << "Would You Like to buy " << getName() << " at " << getPosition() << endl << " y/n.";
+			cin >> c;
 			if (c == 'y' || c == 'Y') {
 				if (P.deductMoney(price) == true) {
 					owner = &P;
 					is_bought = true;
-					P.addProperty(this);
+					P.addRailway(this);
 					P.addRailway();
 				}
 				else {
@@ -29,7 +30,7 @@ public:
 			}
 		}
 		else if (owner != &P && !is_mortgaged) {
-			int rent = 50*P.getRailwaysCount();
+			int rent = 50 * P.getRailwaysCount();
 			cout << "You landed on " << owner->getName() << "'s railway. Pay rent : " << rent << endl;
 			if (!P.deductMoney(rent)) {
 				cout << "Cannot pay rent. Might go bankrupt!" << endl;
@@ -76,10 +77,10 @@ public:
 			cout << "Invalid choice.\n";
 		}
 	}
-    void Mortgage(Player& P) {
+	void Mortgage(Player& P) {
 		if (owner != &P) {
 			cout << "You Do not own it." << endl;
-			return ;
+			return;
 		}
 		if (is_mortgaged) {
 			cout << "Already mortgaged." << endl;
@@ -93,7 +94,7 @@ public:
 		is_mortgaged = true;
 		int value = price / 2;
 		P.addMoney(value);
-		cout << getName()<<"Property mortgaged for $" << value << "." << endl; 
+		cout << getName() << "Property mortgaged for $" << value << "." << endl;
 		P.removeRailway();
 	}
 	void unmortgage(Player& P) {

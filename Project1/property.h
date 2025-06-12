@@ -1,10 +1,10 @@
 #ifndef PROPERTY_H
 #define PROPERTY_H
 
-#include "tiles.h"
+#include "Tiles.h"
+class Player;
 #include <iostream>
 using namespace std;
-
 class Property : public Tiles {
 private:
     int price;

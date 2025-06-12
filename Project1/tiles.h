@@ -1,6 +1,6 @@
 #ifndef TILES_H
 #define TILES_H
-#include"player.h"
+class Player;
 #include<string>
 using namespace std;
 class Tiles {
@@ -17,7 +17,7 @@ public:
 	int getPosition() const {
 		return position;
 	}
-	
+
 	string getName()const {
 		return name;
 	}

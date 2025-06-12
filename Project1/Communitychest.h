@@ -1,13 +1,13 @@
 #ifndef COMMUNITYCHEST_H
 #define COMMUNITYCHEST_H
-#include "tiles.h"
+#include "Tiles.h"
 #include "player.h"
 #include<cstdlib>
 class CommunityChest :public Tiles {
 private:
 	int draw;
 public:
-	CommunityChest() :Tiles("", 0),draw(0) {};
+	CommunityChest() :Tiles("", 0), draw(0) {};
 	CommunityChest(string n, int p) :Tiles(n, p), draw(0) {};
 	void onLand(Player& P)override {
 		draw = rand() % 7 + 1;
@@ -24,7 +24,7 @@ public:
 			cout << "Bank pays you dividend of $50" << endl;
 			P.addMoney(50);
 		}
-		else if (draw==4) {
+		else if (draw == 4) {
 			cout << "Your building and loan matures.Collect $150." << endl;
 			P.addMoney(150);
 		}

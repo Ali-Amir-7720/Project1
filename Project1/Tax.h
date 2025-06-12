@@ -1,7 +1,7 @@
 #ifndef TAX_H
 #define TAX_H
-#include "tiles.h"
-class Tax:public Tiles {
+#include "Tiles.h"
+class Tax :public Tiles {
 private:
 	int tax;
 public:

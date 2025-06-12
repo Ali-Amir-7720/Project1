@@ -1,7 +1,8 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include "tiles.h"
+#include "Tiles.h"
+#include "dice.h"
 #include <iostream>
 using namespace std;
 
@@ -28,7 +29,7 @@ public:
                 if (P.deductMoney(price)) {
                     is_bought = true;
                     owner = &P;
-                    P.addProperty(this);
+                    P.addUtility(this);
                     cout << "Utility bought!" << endl;
                 }
                 else {
@@ -39,7 +40,7 @@ public:
         else if (owner != &P && !is_mortgaged) {
             Dice d;
             int roll = d.rollDice();
-            int rent = roll * 4; 
+            int rent = roll * 4;
             cout << "You rolled " << roll << ". Pay rent $" << rent << " to " << owner->getName() << "." << endl;
             if (P.deductMoney(rent)) {
                 owner->addMoney(rent);
@@ -47,20 +48,7 @@ public:
         }
     }
 
-    void display() const override {
-        cout << "Utility: " << getName()
-            << " | Position: " << getPosition()
-            << " | Price: $" << price;
-
-        if (is_bought) {
-            cout << " | Owner: " << owner->getName()
-                << " | Mortgaged: " << (is_mortgaged ? "Yes" : "No");
-        }
-        else {
-            cout << " | Available to Buy";
-        }
-        cout << endl;
-    }
+    
     void Mortgage(Player& P) {
         if (owner != &P) {
             cout << "You Do not own it." << endl;
