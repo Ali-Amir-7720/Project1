@@ -31,6 +31,7 @@ public:
                     owner = &P;
                     P.addUtility(this);
                     cout << "Utility bought!" << endl;
+                    P.utilityCount();
                 }
                 else {
                     cout << "Not enough money to buy utility." << endl;
@@ -38,17 +39,26 @@ public:
             }
         }
         else if (owner != &P && !is_mortgaged) {
-            Dice d;
-            int roll = d.rollDice();
-            int rent = roll * 4;
-            cout << "You rolled " << roll << ". Pay rent $" << rent << " to " << owner->getName() << "." << endl;
-            if (P.deductMoney(rent)) {
-                owner->addMoney(rent);
+            Dice* d = P.getlastRoll();
+            if (d) {
+                int roll = d->getDice1() + d->getDice2();
+                if (owner->getUC() == 1) {
+                    int rent = roll * 4;
+                    cout << "You rolled " << roll << ". Pay rent $" << rent << " to " << owner->getName() << "." << endl;
+                    if (P.deductMoney(rent)) {
+                        owner->addMoney(rent);
+                    }
+                }
+                else {
+                    int rent = roll * 10;
+                    cout << "You rolled " << roll << ". Pay rent $" << rent << " to " << owner->getName() << "." << endl;
+                    if (P.deductMoney(rent)) {
+                        owner->addMoney(rent);
+                    }
+                }
             }
         }
     }
-
-    
     void Mortgage(Player& P) {
         if (owner != &P) {
             cout << "You Do not own it." << endl;
@@ -62,7 +72,7 @@ public:
             cout << "You can't mortgage from jail." << endl;
             return;
         }
-
+        P.removeUtility();
         is_mortgaged = true;
         int value = price / 2;
         P.addMoney(value);
@@ -78,6 +88,7 @@ public:
         if (P.deductMoney(cost)) {
             is_mortgaged = false;
             cout << "Unmortgaged successfully." << endl;
+            P.utilityCount();
         }
         else {
             cout << "Not enough money to unmortgage." << endl;

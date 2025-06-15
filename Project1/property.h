@@ -14,17 +14,25 @@ private:
     bool is_hotel;
     int base_rent;
     bool is_mortgaged;
-
+    char colour;
+    int same_colour;
 public:
     Property() : Tiles("", 0), price(0), is_bought(false), owner(nullptr),
-        houses_count(0), is_hotel(false), base_rent(0), is_mortgaged(false) {
+        houses_count(0), is_hotel(false), base_rent(0), is_mortgaged(false),same_colour(0) {
     }
-
-    Property(string n, int pos, int p, int br) :
+    int getHouses() {
+        return houses_count;
+    }
+    Property(string n, int pos, int p, int br,char c,int sc) :
         Tiles(n, pos), price(p), is_bought(false), owner(nullptr),
-        houses_count(0), is_hotel(false), base_rent(br), is_mortgaged(false) {
+        houses_count(0), is_hotel(false), base_rent(br), is_mortgaged(false),colour(c),same_colour(sc) {
     }
-
+    Player* getOwner() {
+        return owner;
+    }
+    char getColour()const {
+        return colour;
+    }
     void onLand(Player& P) override {
         if (!is_bought) {
             cout << "You landed on " << getName() << ". Would you like to buy it for $" << price << "? (y/n): ";
@@ -45,11 +53,21 @@ public:
         }
 
         if (owner != &P && !is_mortgaged) {
-            int rent = base_rent + houses_count * (base_rent / 2);
-            cout << "You landed on " << getName() << " owned by " << owner->getName()
-                << ". You owe $" << rent << " in rent." << endl;
-            if (P.deductMoney(rent)) {
-                owner->addMoney(rent);
+            if (is_hotel) {
+                int rent = base_rent + 5 * (base_rent / 2);
+                cout << "You landed on " << getName() << " owned by " << owner->getName()
+                    << ". You owe $" << rent << " in rent." << endl;
+                if (P.deductMoney(rent)) {
+                    owner->addMoney(rent);
+                }
+            }
+            else {
+                int rent = base_rent + houses_count * (base_rent / 2);
+                cout << "You landed on " << getName() << " owned by " << owner->getName()
+                    << ". You owe $" << rent << " in rent." << endl;
+                if (P.deductMoney(rent)) {
+                    owner->addMoney(rent);
+                }
             }
         }
     }
@@ -110,13 +128,111 @@ public:
             }
         }
     }
+    bool buildHouse(Player* P, const vector<Property*>& player_props) {
+        int owned_same_color = 0;
+
+        for (Property* p : player_props) {
+            if (p->getColour() == colour && p->getOwner() == P)
+                owned_same_color++;
+        }
+
+        if (owned_same_color < same_colour) {
+            cout << "You do not own the full color set." << endl;
+            return false;
+        }
+
+        if (is_hotel) {
+            cout << "Cannot build. Already a hotel on this property." << endl;
+            return false;
+        }
+
+        if (houses_count == 4) {
+            char upgrade;
+            cout << "This property has 4 houses. Upgrade to hotel? (y/n): ";
+            cin >> upgrade;
+
+            if ((upgrade == 'y' || upgrade == 'Y') && P->deductMoney(price / 2)) {
+                is_hotel = true;
+                cout << "Hotel built!" << endl;
+                return true;
+            }
+            else {
+                cout << "Hotel upgrade cancelled or not enough money." << endl;
+                return false;
+            }
+        }
+
+        int choice;
+        cout << "How many houses do you want to build (1-" << (4 - houses_count) << "): ";
+        cin >> choice;
+
+        if (choice < 1 || choice >(4 - houses_count)) {
+            cout << "Invalid number of houses." << endl;
+            return false;
+        }
+
+        int cost = (price / 2) * choice;
+
+        if (P->deductMoney(cost)) {
+            houses_count += choice;
+            cout << "Built " << choice << " house(s). Total: " << houses_count << endl;
+            return true;
+        }
+        else {
+            cout << "Not enough money." << endl;
+            return false;
+        }
+    }
+
+
+    bool sellHouse(Player* P) {
+        if (is_hotel) {
+            char sellHotel;
+            cout << "This property has a hotel. Do you want to sell it for $" << (price / 4) << "? (y/n): ";
+            cin >> sellHotel;
+            if (sellHotel == 'y' || sellHotel == 'Y') {
+                is_hotel = false;
+                houses_count = 4;
+                P->addMoney(price / 4);
+                cout << "Hotel sold. Downgraded to 4 houses. You received $" << (price / 4) << endl;
+                return true;
+            }
+            else {
+                cout << "Hotel sale cancelled." << endl;
+                return false;
+            }
+        }
+
+        if (houses_count == 0) {
+            cout << "No houses to sell on this property." << endl;
+            return false;
+        }
+
+        int choice;
+        cout << "This property has " << houses_count << " house(s). How many do you want to sell? ";
+        cin >> choice;
+
+        if (choice < 1 || choice > houses_count) {
+            cout << "Invalid number of houses." << endl;
+            return false;
+        }
+
+        houses_count -= choice;
+        int earned = (price / 4) * choice;
+        P->addMoney(earned);
+        cout << "Sold " << choice << " house(s). You received $" << earned << ". Remaining houses: " << houses_count << endl;
+        return true;
+    }
 
     void mortgage(Player& P) {
         if (owner != &P) {
             cout << "You don't own this property." << endl;
             return;
         }
-
+        if (houses_count > 0) {
+            cout << "Cannot Mortgage.Sell the houses first." << endl;
+            cout << "You have " << houses_count << " Houses." << endl;
+        }
         if (is_mortgaged) {
             cout << "Already mortgaged." << endl;
             return;
@@ -138,7 +254,6 @@ public:
             cout << "Unmortgage not allowed." << endl;
             return;
         }
-
         int cost = price * 0.6;
         if (P.deductMoney(cost)) {
             is_mortgaged = false;
@@ -149,5 +264,4 @@ public:
         }
     }
 };
-
 #endif

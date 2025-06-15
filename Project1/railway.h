@@ -9,6 +9,7 @@ private:
 	bool is_bought;
 	bool is_mortgaged;
 	Player* owner;
+	const vector<Tiles*>* board_ptr = nullptr;
 public:
 	Railways() :Tiles(), price(0), rent(0), is_bought(false), is_mortgaged(false), owner(nullptr) {};
 	Railways(string n, int pos, int rent, int pr) :Tiles(n, pos), price(pr), is_bought(true),rent(rent), is_mortgaged(false), owner(nullptr) {};
@@ -30,7 +31,7 @@ public:
 			}
 		}
 		else if (owner != &P && !is_mortgaged) {
-			int rent = 50 * P.getRailwaysCount();
+			int rent = 50 * owner->getRailwaysCount();
 			cout << "You landed on " << owner->getName() << "'s railway. Pay rent : " << rent << endl;
 			if (!P.deductMoney(rent)) {
 				cout << "Cannot pay rent. Might go bankrupt!" << endl;
@@ -41,42 +42,44 @@ public:
 		}
 		else if (owner == &P) {
 			cout << "You landed on your own railway: " << getName() << "." << endl;
+			if (board_ptr != nullptr) {
+				char choice;
+				cout << "Move to another railway you own? (y/n): ";
+				cin >> choice;
+				if (choice == 'y' || choice == 'Y') {
+					MoveToOwnedRailway(P);
+				}
+			}
 		}
 	}
-	void MoveToOwnedRailway(Player& player, const vector<Tiles*>& board) {
-		vector<int> ownedRailwayPositions;
-		for (int pos : {5, 15, 25, 35}) {
-			if (pos == player.getPosition()) continue;
-			Railways* r = dynamic_cast<Railways*>(board[pos]);
-			if (r && r->getOwner() == &player) {
-				ownedRailwayPositions.push_back(pos);
+	void MoveToOwnedRailway(Player& player) {
+		vector<Railways*> owned_railways = player.getRailways();
+		int current_pos = player.getPosition();
+		bool moved = false;
+
+		for (Railways* railway : owned_railways) {
+			if (railway->getPosition() != current_pos) {
+				cout << "Do you want to move to " << railway->getName()
+					<< " at position " << railway->getPosition() << "? (y/n): ";
+				char choice;
+				cin >> choice;
+
+				if (choice == 'y' || choice == 'Y') {
+					player.setPosition(railway->getPosition());
+					cout << "Moved to your railway: " << railway->getName() << endl;
+					railway->onLand(player);
+					moved = true;
+					break;
+				}
 			}
 		}
 
-		if (ownedRailwayPositions.empty()) {
-			cout << "You don't own any other railways to move to.\n";
-			return;
-		}
-
-		cout << "You own the following railways:\n";
-		for (size_t i = 0; i < ownedRailwayPositions.size(); ++i) {
-			Railways* r = dynamic_cast<Railways*>(board[ownedRailwayPositions[i]]);
-			cout << i + 1 << ". " << r->getName() << " at position " << ownedRailwayPositions[i] << endl;
-		}
-
-		cout << "Enter the number of the railway you want to move to: ";
-		int choice;
-		cin >> choice;
-
-		if (choice >= 1 && choice <= (int)ownedRailwayPositions.size()) {
-			int targetPos = ownedRailwayPositions[choice - 1];
-			player.setPosition(targetPos);
-			board[targetPos]->onLand(player);
-		}
-		else {
-			cout << "Invalid choice.\n";
+		if (!moved) {
+			cout << "No railway selected or no other owned railway available.\n";
 		}
 	}
+
+
 	void Mortgage(Player& P) {
 		if (owner != &P) {
 			cout << "You Do not own it." << endl;
@@ -124,6 +127,9 @@ public:
 			<< ", Owned: " << (is_bought ? "Yes" : "No")
 			<< ", Mortgaged: " << (is_mortgaged ? "Yes" : "No")
 			<< ", Owner: " << (owner ? owner->getName() : "None") << endl;
+	}
+	bool isMortgaged() const {
+		return is_mortgaged;
 	}
 };
 #endif

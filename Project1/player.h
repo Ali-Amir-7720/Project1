@@ -122,13 +122,15 @@ class Player {
 private:
     int money;
     string name;
-    int r_c;
+    int r_c=0;
+    int u_c=0;
     int pos;
     vector<Property*> owned_property;
     vector<Utility*> owned_utility;
     vector<Railways*> owned_railway;
     bool jail_status;
     int jail_turns;
+    Dice* last_roll;
 
 public:
     Player();
@@ -140,7 +142,9 @@ public:
     int getMoney() const;
     bool jailStatus() const;
     const vector<Property*>& getProperties() const;
-
+    const vector<Utility*>& getUtilities() const;
+    const vector<Railways*>& getRailways() const;
+    bool checkpos(int steps);
     void Move(int steps);
     void setPosition(int p);
     void addMoney(int amount);
@@ -153,7 +157,13 @@ public:
     void IncrementJailTurns();
     void removeRailway();
     void addRailway();
+    void utilityCount();
+    int getUC();
+    void removeUtility();
     int getRailwaysCount() const;
+    void setLastDice(Dice& d);
+    Dice* getlastRoll()const;
+    int getJailTurns()const;
 };
 
 #endif

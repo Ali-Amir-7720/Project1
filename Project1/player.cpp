@@ -10,10 +10,12 @@ Player::Player(const string n) {
     r_c = 0;
     money = 5000;
     jail_status = false;
-    jail_turns = 3;
+    jail_turns = 0;
     pos = 0;
 }
-
+int Player::getJailTurns()const {
+    return jail_turns;
+}
 void Player::ReleasefromJail() {
     jail_status = false;
     jail_turns = 0;
@@ -34,24 +36,45 @@ int Player::getMoney() const {
 bool Player::jailStatus() const {
     return jail_status;
 }
-
+const vector<Utility*>&Player:: getUtilities() const {
+    return owned_utility;
+}
+const vector<Railways*>& Player::getRailways() const {
+    return owned_railway;
+}
 const vector<Property*>& Player::getProperties() const {
     return owned_property;
 }
+void Player::utilityCount() {
+    u_c++;
+}
+void Player::removeUtility() {
+    u_c--;
+}
+int Player::getUC() {
+    return u_c;
+}
+bool Player::checkpos(int steps) {
+    int old_pos = pos;
+    pos = (pos + steps) % 40;
 
+    return pos < old_pos;
+}
 void Player::Move(int steps) {
-
     pos = (pos + steps) % 40;
 }
-
 void Player::setPosition(int p) {
     pos = p % 40;
 }
-
+void Player::setLastDice(Dice &d) {
+    last_roll = &d;
+}
 void Player::addMoney(int amount) {
     money += amount;
 }
-
+Dice* Player::getlastRoll()const {
+    return last_roll;
+}
 bool Player::deductMoney(int amount) {
     if (amount > money) {
         cout << "Not Enough Money.";
@@ -87,12 +110,25 @@ bool Player::isBankrupt() {
     if (money >= 0) {
         return false;
     }
-    for (int i = 0; i < (int)owned_property.size(); i++) {
-        Property* p = owned_property[i];
-        if (!p->isMortgaged()) {
+
+    for (Property* p : owned_property) {
+        if (!p->isMortgaged() || p->getHouses() > 0) {
             return false;
         }
     }
+
+    for (Utility* u : owned_utility) {
+        if (!u->isMortgaged()) {
+            return false;
+        }
+    }
+
+    for (Railways* r : owned_railway) {
+        if (!r->isMortgaged()) {
+            return false;
+        }
+    }
+
     return true;
 }
 
